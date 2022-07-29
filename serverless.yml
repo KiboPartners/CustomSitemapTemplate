@@ -1,0 +1,29 @@
+service: example-kibo-cloud-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  role: arn:aws:iam::972594397100:role/Lambda-Standard
+
+functions: 
+  app:
+    handler: src/app.handler
+    events: 
+      - http: 
+          path: /
+          method: ANY
+          cors: true
+      - http: 
+          path: /{proxy+}
+          method: ANY
+          cors: true
+      # Every day at 3AM CT
+      - schedule: cron(0 8 ? * * *)
+    
+package:
+  individually: false
+  include:
+    - mozu.config.json
+    - node_modules/**
